@@ -7,6 +7,7 @@ module Discrete where
 
 import qualified Data.Map as M
 import System.Random
+import Control.Monad (ap)
 
 -- ------------------------------------------------------------------------
 -- Representing distributions
@@ -281,6 +282,10 @@ data Dst a where
 instance Functor Dst where
    fmap f (Single pt) = Single (map (map_fst f) pt)
    fmap f (Chain d k) = Chain d (fmap f . k)
+
+instance Applicative Dst where
+   pure = return
+   (<*>) = ap 
   
 instance Monad Dst where
   return x = Single [(x,1)]
