@@ -12,15 +12,14 @@ git clone git@github.com:banacorn/Hakaru-FLOLAC16.git
 cd Hakaru-FLOLAC16
 ```
 
-2. Build & Run
+2. Enter GHCi
 
 ```shell
 cd src
-ghc -O2  -rtsopts Bench.hs
-GHCRTS="-tstderr" ./Bench 10 10000
+ghci Discrete1.hs
 ```
 
-3. Install whatever `ghc` complains, you may need some of these packages
+3. You may need some of these packages:
 
 ```shell
 cabal install mtl transformers random
