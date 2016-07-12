@@ -15,7 +15,6 @@ cd Hakaru-FLOLAC16
 2. Enter GHCi
 
 ```shell
-cd src
 ghci Discrete1.hs
 ```
 
