@@ -19,8 +19,9 @@ cd src
 ghci Discrete1.hs
 ```
 
-3. You may need some of these packages:
+3. You may need some of these packages: `mtl`, `transformers`, `random`
 
+To install them:
 ```shell
 cabal install mtl transformers random
 ```
