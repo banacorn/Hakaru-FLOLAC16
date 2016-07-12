@@ -7,21 +7,20 @@
 
 1. Clone this repo (or just download it anyway)
 
-```shell
-git clone git@github.com:banacorn/Hakaru-FLOLAC16.git
-cd Hakaru-FLOLAC16
-```
+  ```shell
+  git clone git@github.com:banacorn/Hakaru-FLOLAC16.git
+  cd Hakaru-FLOLAC16
+  ```
 
 2. Enter GHCi
 
-```shell
-cd src
-ghci Discrete1.hs
-```
+  ```shell
+  cd src
+  ghci Discrete1.hs
+  ```
 
-3. You may need some of these packages: `mtl`, `transformers`, `random`
+3. You may need some of these packages:
 
-To install them:
-```shell
-cabal install mtl transformers random
-```
+  ```shell
+  cabal install mtl transformers random
+  ```
