@@ -23,6 +23,7 @@
     ```
     *Discrete> runSample 10 twocoins
     [True,False,True,False,False,True,False,False,False,True]
+    ```
 
 3. You may need some of these packages: `mtl`, `transformers`, `random`
 
