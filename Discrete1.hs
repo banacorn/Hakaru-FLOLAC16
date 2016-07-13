@@ -55,7 +55,7 @@ class Dist' d where
   -- How to represent the conditional distribution Pr(X|P)?
   -- (for some parameters P)?
   -- Obviously, like functions P -> Pr(X)
-  
+
   -- How to represent the chain law
   -- Pr(X=x,Y=y) = PR(X=x) * Pr(Y=y|X=x)
   chain' :: d a -> (a -> d b) -> d (a,b)
@@ -102,7 +102,7 @@ twocoins'' = chain'' (bern'' 0.5) $ \x ->
 
 -- We haven't lost anything
 
-twocoins1'' = 
+twocoins1'' =
   chain'' (bern'' 0.5) $ \x ->
   chain'' (bern'' 0.5) $ \y ->
   dirac'' (x,(y,(xor x y)))
@@ -118,18 +118,18 @@ class Monad d => Dist d where
   failure :: d a         -- we see the need for this when it comes to
                          -- conditioning
 
-twocoins = do       
+twocoins = do
   x <- bern 0.5
   y <- bern 0.5
   return $ xor x y
 
-twocoins1 = do       
+twocoins1 = do
   x <- bern 0.5
   y <- bern 0.5
   return $ (x,(y,xor x y))
 
 -- This is just the syntactic sugar. GHC re-writes it into the form
--- twocoins' that we saw before. 
+-- twocoins' that we saw before.
 
 -- Again, what is the type of twocoins?
 
@@ -158,7 +158,7 @@ grass_fwd = do
 nor :: Double -> Double -> Double -> Bool -> Bool -> Dst Bool
 nor strengthX strengthY noise x y =
   bern $ 1 - nnot (1-strengthX) x * nnot (1-strengthY) y * (1-noise)
-  
+
 -- noisy not function
 nnot :: Num a => a -> Bool -> a
 nnot p True  = p
@@ -306,7 +306,7 @@ joint3 = do
 
 _ = runExact joint3
 
--- Pr(Coin1=x|Same=Fasle)
+-- Pr(Coin1=x|Same=False)
 one_not_same = do
   (coin1,coin2,coin3,same) <- joint3
   if same then failure  -- erasing rows
@@ -323,7 +323,7 @@ _ = normalize $ runExact one_not_same
 normalize :: PT a -> PT a
 normalize pt = map (map_snd (/nf)) pt
  where nf = sum $ map snd pt
-       
+
 -- Eldest daughter puzzle
 -- A family has exactly two kids, one of them is a girl.
 -- What is the chance the older is a girl?
@@ -366,7 +366,7 @@ _ = runExact $ fair_coin (bern 0.2)
 drunk_coin :: Dst Bool
 drunk_coin = undefined
 
--- Compute AND of n tosses of the drunk coin 
+-- Compute AND of n tosses of the drunk coin
 dcoin_and n = undefined
 
 -- _ = runExact $ dcoin_and 10
@@ -400,7 +400,7 @@ instance Bounded HMMState where
 instance Enum HMMState where
   succ (HS i) = HS (i+1)
   pred (HS i) = HS (i-1)
-  
+
 -- Transition Probabilities
 transitions :: HMMState -> PT HMMState
 transitions st = case () of
@@ -414,7 +414,7 @@ data HMMObs = L | R
 -- We use the numeric values directly from the Primula code
 l_observation_prob :: M.Map HMMState Prob
 l_observation_prob = M.fromList $
-   zip [minBound..maxBound] 
+   zip [minBound..maxBound]
        [1.0, 0.85714, 0.71428, 0.57142, 0.42857, 0.28571, 0.14285, 0.0]
 
 -- The evolution function: compute the state for the next step
@@ -480,7 +480,7 @@ instance Monad Dst where
   Single []      >>= k = Single []
   Single [(x,1)] >>= k = k x    -- Nothing to sum over
   Single pt      >>= k = Chain pt k
-  
+
   -- Exercise: justify this
   -- Sum_y (Sum_x Pr(X=x) * Pr(Y=y|X=x)) * Pr(Z=z|Y=y)
   -- Sum_y (Sum_x Pr(X=x) * Pr(Y=y|X=x) * Pr(Z=z|Y=y))
@@ -500,10 +500,10 @@ runExact (Chain pt k) =
 instance Dist Dst where
   bern p  = Single [(True, p), (False,1-p)]
   failure = Single []
-  
+
 instance Die Dst where
   die = Single $ [ (x,1/6) | x <- [1..6] ]
-  
+
 _ = runExact twocoins
 
 -- A different handler: sampling
@@ -623,4 +623,3 @@ repr2' =
 -- We need something better
 -- We need
 --  sampleAndThen to have the type Dist a -> (a -> Dist b) -> Dist b
-
