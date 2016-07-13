@@ -411,7 +411,7 @@ transitions st = case () of
   _                  -> [(st,0.4),(succ st,0.3),(pred st,0.3)]
 
 -- Observations
-data HMMObs = L | R
+data HMMObs = L | R deriving (Eq, Ord, Show)
 -- Tabulate the observation probabilities: of observing L
 -- We use the numeric values directly from the Primula code
 l_observation_prob :: M.Map HMMState Prob
