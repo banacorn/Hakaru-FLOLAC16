@@ -398,6 +398,8 @@ instance Bounded HMMState where
   maxBound = HS 8
 
 instance Enum HMMState where
+  toEnum i = HS i
+  fromEnum (HS i) = i
   succ (HS i) = HS (i+1)
   pred (HS i) = HS (i-1)
 
