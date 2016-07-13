@@ -2,8 +2,9 @@
 
 * [埋込み確率プログラミング言語とその漸進評価](http://okmij.org/ftp/kakuritu/Hakaru10/PPL.pdf)
 * [Problems of the Lightweight Implementation of Probabilistic Programming](http://okmij.org/ftp/kakuritu/Hakaru10/PPS2016.pdf)
+* [The original FTP folder of these files](http://okmij.org/ftp/kakuritu/Hakaru10/)
 
-# How to run this
+# How to run these codes
 
 1. Clone this repo (or just download it anyway)
 
@@ -18,7 +19,7 @@
     ghci Discrete1.hs
     ```
 
-    For example, you can play with those examples with `runSample :: Int -> Dst a -> [a]` in `Discrete`
+    For example, you can play with those `DST`s with `runSample :: Int -> Dst a -> [a]` in `Discrete`
 
     ```
     *Discrete> runSample 10 twocoins
@@ -30,3 +31,5 @@
     ```shell
     cabal install mtl transformers random
     ```
+
+Courtesy of Oleg Kiselyov.
