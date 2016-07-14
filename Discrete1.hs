@@ -328,10 +328,15 @@ normalize pt = map (map_snd (/nf)) pt
 -- A family has exactly two kids, one of them is a girl.
 -- What is the chance the older is a girl?
 
-girl = undefined
+girl :: Dst Bool
+girl = do
+  g1 <- bern 0.5
+  g2 <- bern 0.5
+  if g1 || g2 then return g1 else failure
 
--- _ = runExact girl
--- _ = normalize $ runExact girl
+
+_ = runExact girl
+_ = normalize $ runExact girl
 
 -- Grass model
 
@@ -339,13 +344,31 @@ grass_wet = do
   rain         <- bern 0.3
   sprinkler    <- bern 0.5
   grass_is_wet <- nor 0.9 0.8 0.1 rain sprinkler
-  undefined
+  if not grass_is_wet then failure else return (rain,sprinkler)
+
 
 -- Pr(Rain|Wet)
+_ = normalize . runExact $ do { (r,s) <- grass_wet; return r}
 -- The result matches what we had before. Much simpler this time, right?
+_ = normalize . runExact $ do { (r,s) <- grass_wet; return s}
 
 
 
+
+alarm :: Dst Bool
+alarm = do
+  b <- bern 0.001
+  e <- bern 0.002
+  a <- case (b,e) of
+        (True,True)   -> bern 0.95
+        (True,False)  -> bern 0.94
+        (False,True)  -> bern 0.29
+        (False,False) -> bern 0.001
+  j <- if a then bern 0.9 else bern 0.05
+  m <- if a then bern 0.7 else bern 0.01
+  if (j && not m) then return b else failure
+
+_ = normalize $ runExact alarm
 
 -- Fair coin tosses given arbitrarily biased coin (von Neumann trick)
 -- Show/Prove the correctness
@@ -364,12 +387,22 @@ _ = runExact $ fair_coin (bern 0.2)
 -- the result of flipping is a lost/dropped coin
 
 drunk_coin :: Dst Bool
-drunk_coin = undefined
+drunk_coin = do
+  c <- bern 0.5
+  lost <- bern 0.9
+  if lost then failure else return c
 
 -- Compute AND of n tosses of the drunk coin
-dcoin_and n = undefined
+dcoin_and n = fmap (foldr1 (&&)) . sequence $ replicate n drunk_coin
 
--- _ = runExact $ dcoin_and 10
+dcoin_and1 1 = drunk_coin
+dcoin_and1 n = do
+  -- t <-  dcoin_and1 (n-1)
+  t <- categorical . runExact $ dcoin_and1 (n-1)
+  h <- drunk_coin
+  return $ h && t
+
+_ = runExact $ dcoin_and 10
 -- [(False,9.990234374999978e-11),(True,9.765624999999978e-14)]
 
 -- Can we implement more efficiently?
@@ -398,10 +431,10 @@ instance Bounded HMMState where
   maxBound = HS 8
 
 instance Enum HMMState where
-  toEnum i = HS i
-  fromEnum (HS i) = i
   succ (HS i) = HS (i+1)
   pred (HS i) = HS (i-1)
+  fromEnum (HS i) = i
+  toEnum = HS
 
 -- Transition Probabilities
 transitions :: HMMState -> PT HMMState
@@ -411,7 +444,8 @@ transitions st = case () of
   _                  -> [(st,0.4),(succ st,0.3),(pred st,0.3)]
 
 -- Observations
-data HMMObs = L | R deriving (Eq, Ord, Show)
+data HMMObs = L | R deriving (Eq,Show)
+
 -- Tabulate the observation probabilities: of observing L
 -- We use the numeric values directly from the Primula code
 l_observation_prob :: M.Map HMMState Prob
@@ -433,16 +467,17 @@ hmmobserve st =
 -- Queries
 -- Run the model for N steps, asserting observations
 
-{-
-do_evolve n evidence =
-  let st0 = uniformly [minBound..maxBound] in
-  let rec iter i n st =
-    if i > n then st
-    else let () = evidence st i in		(* check the evidence *)
-         iter (succ i) n (evolve st)
-  in iter 1 n st0
--}
+evolve_with_evidence :: Int -> (Int -> HMMState -> Dst ()) ->
+                        Dst HMMState
+evolve_with_evidence n evidence = do
+  st0 <- uniformly [minBound..maxBound::HMMState]
+  let evolvecheck st i = do
+        s <- categorical . runExact $ st
+        evidence i s
+        evolve s
+  foldl evolvecheck (return st0) [1..n]
 
+_ = runExact $ evolve_with_evidence 10 (\i s -> if i == 5 then do {o <- hmmobserve s; if o == L then return () else failure} else return ())
 
 -- ------------------------------------------------------------------------
 -- Implementation
@@ -530,7 +565,7 @@ runSample n m = go (mkStdGen 17) n m
 
 _ = runSample 10 twocoins
 
-_ = let n = 20 in (/ fromIntegral n) . fromIntegral . length . filter id $ runSample n grass_fwd
+_ = let n = 10000 in (/ fromIntegral n) . fromIntegral . length . filter id $ runSample n grass_fwd
 
 categorical :: PT a -> Dst a
 categorical = Single
