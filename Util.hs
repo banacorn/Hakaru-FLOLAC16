@@ -59,7 +59,7 @@ plot :: Histogram -> IO ()
 plot dat = do
   withFile fname WriteMode write_data
  where
-   fname = "/tmp/plot.dat"
+   fname = "./plot.dat"
    write_data h = do
      hPutStrLn h "x  y"
      mapM_ (\ (k,v) -> hPutStrLn h $ unwords [show k,show v]) $ M.toList dat
