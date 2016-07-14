@@ -1,3 +1,4 @@
+{-# Language DataKinds #-}
 -- Various simple examples of using Hakaru10
 
 module ExTutorial where
@@ -5,6 +6,7 @@ module ExTutorial where
 import Syntax
 import Util
 import Control.Applicative
+import Metropolis (DistK(..), DistKind(..))
 
 _ = plot $ tabulate 0.4 $ mcmC 10000 (dist normal 0 1)
 _ = momenta $ mcmC 1000 (dist normal 0 1)
@@ -27,10 +29,10 @@ grass = do
   return rain
 
 -- noisy-or function
-nor :: Double -> Double -> Double -> Bool -> Bool -> Distribution Bool
+nor :: Double -> Double -> Double -> Bool -> Bool -> DistK 'KResampleable Bool
 nor strengthX strengthY noise x y =
   bern $ 1 - nnot (1-strengthX) x * nnot (1-strengthY) y * (1-noise)
-  
+
 -- noisy not function
 nnot :: Num a => a -> Bool -> a
 nnot p True  = p
