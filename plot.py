@@ -1,16 +1,25 @@
 #! /usr/bin/env python3
 
+import argparse
 import numpy as np
 import matplotlib.pyplot as plt
 
-data = []
-with open('plot.dat') as f:
-    next(f)
-    for l in f:
-        x, y = [float(d) for d in l.strip().split()]
-        data.append((x, y))
+parser = argparse.ArgumentParser(description='plotting data')
+parser.add_argument('filename')
 
-data = np.array(data)
+def plot(filename):
+    data = []
+    with open(filename) as f:
+        next(f)
+        for l in f:
+            x, y = [float(d) for d in l.strip().split()]
+            data.append((x, y))
 
-plt.plot(data[:,0], data[:,1])
-plt.show()
+    data = np.array(data)
+
+    plt.plot(data[:,0], data[:,1], drawstyle='steps', linewidth=2)
+    plt.show()
+
+if __name__ == '__main__':
+    args = parser.parse_args()
+    plot(args.filename)
